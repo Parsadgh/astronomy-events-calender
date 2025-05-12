@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <title>تقویم جامع رویدادهای نجومی</title>
     <link href="https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/jalaali-js@1.1.1/dist/jalaali.min.js"></script>
     <style>
         @import url('https://cdn.fontcdn.ir/Font/Persian/Vazir/Vazir.css');
 
@@ -710,10 +711,54 @@
 
 
     <script>
+
         function showSection(id) {
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
+
+        const persianMonths = [
+            "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
+            "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
+        ];
+
+        const gregorianMonths = [
+            "ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن",
+            "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر"
+        ];
+
+        function getMonthIndex(text) {
+            for (let i = 0; i < 12; i++) {
+                if (text.includes(persianMonths[i])) return i;
+                if (text.includes(gregorianMonths[i])) return i;
+            }
+            return -1; // در صورتی که ماهی پیدا نشه
+        }
+
+        function sortCurrentVisibleTable() {
+            const activeSection = document.querySelector('.section.active');
+            if (!activeSection) return;
+
+            const table = activeSection.querySelector('table');
+            const rows = Array.from(table.querySelectorAll('tr')).slice(1); // بدون تایتل
+
+            rows.sort((a, b) => {
+                const aMonth = getMonthIndex(a.cells[0].textContent.trim());
+                const bMonth = getMonthIndex(b.cells[0].textContent.trim());
+                return aMonth - bMonth;
+            });
+
+            // پاک کردن ردیف‌های قدیمی و چسباندن جدیدا
+            for (const row of rows) table.appendChild(row);
+        }
+
+        sortCurrentVisibleTable(); // اجرا برای بار اول (میتونی بذاری بعد از load)
+
+        document.querySelectorAll('.filters button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setTimeout(sortCurrentVisibleTable, 200); // بعد از تغییر بخش، کمی صبر کن تا لود بشه
+            });
+        });
     </script>
 </body>
 
